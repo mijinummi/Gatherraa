@@ -63,6 +63,26 @@ Gathera/
 - Soroban CLI
 - npm or yarn
 
+### Environment Setup
+
+Before running the project, copy the example environment files and configure them for your environment:
+
+```bash
+# Root environment variables
+cp .env.example .env
+
+# Backend environment variables
+cp app/backend/.env.example app/backend/.env
+
+# Frontend environment variables
+cp app/frontend/.env.example app/frontend/.env.local
+
+# Image service environment variables
+cp app/image-service/.env.example app/image-service/.env
+```
+
+Edit each `.env` file and fill in the required values. See the comments in each `.env.example` file for details on each variable.
+
 ### Installation
 
 ```bash
