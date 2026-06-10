@@ -9,6 +9,23 @@ const cors = require('cors');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 
+// ── Structured logger ────────────────────────────────────────────────────
+const LOG_LEVELS = { debug: 0, info: 1, warn: 2, error: 3 };
+const currentLevel = LOG_LEVELS[process.env.LOG_LEVEL] ?? LOG_LEVELS.info;
+
+const logger = {
+  info(msg, meta) {
+    if (currentLevel <= LOG_LEVELS.info) {
+      process.stdout.write(JSON.stringify({ level: 'info', message: msg, ...(meta || {}), timestamp: new Date().toISOString() }) + '\n');
+    }
+  },
+  error(msg, err, meta) {
+    if (currentLevel <= LOG_LEVELS.error) {
+      process.stderr.write(JSON.stringify({ level: 'error', message: msg, error: err?.message ?? String(err ?? ''), stack: err?.stack, ...(meta || {}), timestamp: new Date().toISOString() }) + '\n');
+    }
+  },
+};
+
 const PORT = process.env.PORT || 4000;
 const USE_S3 = (process.env.USE_S3 || 'false') === 'true';
 const S3_BUCKET = process.env.AWS_S3_BUCKET;
@@ -141,7 +158,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
     return res.json({ id, files: results });
   } catch (err) {
-    console.error(err);
+    logger.error('Upload error', err);
     return res.status(500).json({ error: 'internal_error', detail: err.message });
   }
 });
@@ -160,7 +177,7 @@ app.get('/signed-url', async (req, res) => {
     const token = Buffer.from(`${key}:${Date.now()}`).toString('base64');
     return res.json({ url: `/images/${key}?token=${token}`, token });
   } catch (err) {
-    console.error(err);
+    logger.error('Signed URL error', err);
     res.status(500).json({ error: 'internal_error' });
   }
 });
@@ -173,5 +190,5 @@ if (!USE_S3) {
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.listen(PORT, () => {
-  console.log(`Image service listening on port ${PORT} (USE_S3=${USE_S3})`);
+  logger.info(`Image service listening on port ${PORT}`, { port: PORT, useS3: USE_S3 });
 });

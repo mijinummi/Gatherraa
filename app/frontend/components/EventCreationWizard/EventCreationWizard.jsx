@@ -3,6 +3,7 @@ import StepBasicInfo from "./steps/StepBasicInfo";
 import StepDateLocation from "./steps/StepDateLocation";
 import StepReview from "./steps/StepReview";
 import { validators } from "./validators";
+import { logger } from "@/lib/logger";
 
 const steps = [
   StepBasicInfo,
@@ -43,7 +44,7 @@ export default function EventCreationWizard() {
   const handleSubmit = () => {
     if (!validateStep()) return;
 
-    console.log("Submitting event:", formData);
+    logger.info("Submitting event:", { formData });
 
     // TODO: Replace with API call
     // await createEvent(formData);

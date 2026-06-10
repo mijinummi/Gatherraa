@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 
@@ -6,25 +6,27 @@ import { createClient, RedisClientType } from 'redis';
 export class SessionsService implements OnModuleInit, OnModuleDestroy {
   private redisClient: RedisClientType;
 
+  private readonly logger = new Logger(SessionsService.name);
+
   constructor(private configService: ConfigService) {
     this.redisClient = createClient({
       url: this.configService.get<string>('REDIS_URL'),
     });
     
     this.redisClient.on('error', (err) => {
-      console.error('Redis Client Error', err);
+      this.logger.error('Redis Client Error', err instanceof Error ? err.stack : undefined);
     });
   }
 
   async onModuleInit() {
     try {
       await this.redisClient.connect();
-      console.log('Redis client connected successfully');
+      this.logger.log('Redis client connected successfully');
     } catch (error) {
-      console.error('Failed to connect to Redis:', error);
+      this.logger.error('Failed to connect to Redis', error instanceof Error ? error.stack : undefined);
       // In development, we can continue without Redis
       if (this.configService.get<string>('NODE_ENV') !== 'production') {
-        console.warn('Running without Redis session storage');
+        this.logger.warn('Running without Redis session storage');
       }
     }
   }
@@ -52,7 +54,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       
       return true;
     } catch (error) {
-      console.error('Failed to create session:', error);
+      this.logger.error('Failed to create session', error instanceof Error ? error.stack : undefined);
       return false;
     }
   }
@@ -64,7 +66,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       
       return JSON.parse(sessionData);
     } catch (error) {
-      console.error('Failed to get session:', error);
+      this.logger.error('Failed to get session', error instanceof Error ? error.stack : undefined);
       return null;
     }
   }
@@ -88,7 +90,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       
       return true;
     } catch (error) {
-      console.error('Failed to update session:', error);
+      this.logger.error('Failed to update session', error instanceof Error ? error.stack : undefined);
       return false;
     }
   }
@@ -103,7 +105,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       await this.redisClient.del(`session:${sessionId}`);
       return true;
     } catch (error) {
-      console.error('Failed to delete session:', error);
+      this.logger.error('Failed to delete session', error instanceof Error ? error.stack : undefined);
       return false;
     }
   }
@@ -113,7 +115,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       const sessionIds = await this.redisClient.sMembers(`user:sessions:${userId}`);
       return sessionIds;
     } catch (error) {
-      console.error('Failed to get user sessions:', error);
+      this.logger.error('Failed to get user sessions', error instanceof Error ? error.stack : undefined);
       return [];
     }
   }
@@ -134,7 +136,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       
       return true;
     } catch (error) {
-      console.error('Failed to invalidate user sessions:', error);
+      this.logger.error('Failed to invalidate user sessions', error instanceof Error ? error.stack : undefined);
       return false;
     }
   }
@@ -147,7 +149,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       await this.redisClient.expire(`session:${sessionId}`, ttl);
       return true;
     } catch (error) {
-      console.error('Failed to extend session:', error);
+      this.logger.error('Failed to extend session', error instanceof Error ? error.stack : undefined);
       return false;
     }
   }
@@ -158,7 +160,7 @@ export class SessionsService implements OnModuleInit, OnModuleDestroy {
       // But we can implement additional cleanup logic if needed
       return 0;
     } catch (error) {
-      console.error('Failed to cleanup sessions:', error);
+      this.logger.error('Failed to cleanup sessions', error instanceof Error ? error.stack : undefined);
       return 0;
     }
   }

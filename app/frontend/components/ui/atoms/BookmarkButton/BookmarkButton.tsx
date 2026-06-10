@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export interface BookmarkButtonProps {
   /** Current bookmarked state */
@@ -85,7 +86,7 @@ const BookmarkButton = React.forwardRef<HTMLButtonElement, BookmarkButtonProps>(
             onBookmarkChange?.(isBookmarked);
           }
         } catch (error) {
-          console.warn('Failed to load bookmark state from localStorage:', error);
+          logger.warn('Failed to load bookmark state from localStorage:', { error: String(error) });
         }
       }
     }, [persistent, storageKey, onBookmarkChange]);
@@ -96,7 +97,7 @@ const BookmarkButton = React.forwardRef<HTMLButtonElement, BookmarkButtonProps>(
         try {
           localStorage.setItem(storageKey, JSON.stringify(bookmarked));
         } catch (error) {
-          console.warn('Failed to save bookmark state to localStorage:', error);
+          logger.warn('Failed to save bookmark state to localStorage:', { error: String(error) });
         }
       }
     }, [persistent, storageKey]);
@@ -123,7 +124,7 @@ const BookmarkButton = React.forwardRef<HTMLButtonElement, BookmarkButtonProps>(
         setInternalBookmarked(newBookmarkedState);
         saveToStorage(newBookmarkedState);
       } catch (error) {
-        console.error('Bookmark action failed:', error);
+        logger.error('Bookmark action failed:', error);
         // Revert state on error
         setInternalBookmarked(internalBookmarked);
       } finally {

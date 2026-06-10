@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -26,6 +26,8 @@ export interface MfaChallengeResult {
 
 @Injectable()
 export class MfaService {
+  private readonly logger = new Logger(MfaService.name);
+
   constructor(
     @InjectRepository(MfaSetting)
     private readonly mfaSettingRepository: Repository<MfaSetting>,
@@ -446,7 +448,7 @@ export class MfaService {
     const code = this.generateTimeBasedCode(mfaSetting.secret);
     
     // In production, integrate with SMS service like Twilio
-    console.log(`SMS Code for ${mfaSetting.phoneNumber}: ${code}`);
+    this.logger.info('SMS MFA code sent', { userId: user.id });
     
     return mfaSetting.phoneNumber;
   }

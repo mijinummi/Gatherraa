@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, RedisClientType } from 'redis';
 
@@ -16,13 +16,15 @@ export interface CartData {
 export class CartService implements OnModuleInit, OnModuleDestroy {
     private redisClient: RedisClientType;
 
+    private readonly logger = new Logger(CartService.name);
+
     constructor(private configService: ConfigService) {
         this.redisClient = createClient({
             url: this.configService.get<string>('REDIS_URL'),
         });
 
         this.redisClient.on('error', (err) => {
-            console.error('Booking CartService Redis Error:', err);
+            this.logger.error('Booking CartService Redis Error', err instanceof Error ? err.stack : undefined);
         });
     }
 
@@ -30,7 +32,7 @@ export class CartService implements OnModuleInit, OnModuleDestroy {
         try {
             await this.redisClient.connect();
         } catch (error) {
-            console.error('CartService failed to connect to Redis:', error);
+            this.logger.error('CartService failed to connect to Redis', error instanceof Error ? error.stack : undefined);
         }
     }
 

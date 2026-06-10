@@ -3,6 +3,7 @@
 import React from 'react';
 import { Wallet, Clock, Users, AlertCircle } from 'lucide-react';
 import { Button } from '../../atoms';
+import { logger } from '@/lib/logger';
 
 // ─── Types ────────────────────────────────────────────────────────────
 
@@ -150,8 +151,7 @@ export const RegistrationGuard: React.FC<RegistrationGuardProps> = ({
             fullWidth
             leftIcon={<Wallet className="w-4 h-4" />}
             onClick={() => {
-              // In a real app, this would trigger wallet connection
-              console.log('Connect wallet clicked');
+              logger.info('Connect wallet clicked');
             }}
           >
             Connect Wallet

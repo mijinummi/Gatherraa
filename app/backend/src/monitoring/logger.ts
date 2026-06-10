@@ -25,7 +25,10 @@ class Logger {
         body: JSON.stringify(payload),
       });
     } catch (err) {
-      console.error('Failed to send log to backend', err);
+      // Logging infrastructure failure - fallback to structured stderr
+      if (typeof process !== 'undefined' && process.stderr) {
+        process.stderr.write(JSON.stringify({ level: 'error', message: 'Failed to send log to backend', error: String(err), timestamp: new Date().toISOString() }) + '\n');
+      }
     }
   }
 
@@ -40,8 +43,8 @@ class Logger {
       message,
       stack,
       metadata,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
+      url: typeof window !== 'undefined' ? window.location.href : '',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
       timestamp: new Date().toISOString(),
     };
   }
@@ -49,19 +52,29 @@ class Logger {
   error(message: string, error?: any, metadata?: any) {
     const payload = this.buildPayload('error', message, error?.stack, metadata);
 
-    console.error(message, error);
+    // Development: structured console output
+    if (typeof process === 'undefined' || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production')) {
+      // eslint-disable-next-line no-console
+      console.error(`[ERROR] ${message}`, error ?? '', metadata ?? '');
+    }
     this.sendToBackend(payload);
   }
 
   warn(message: string, metadata?: any) {
     const payload = this.buildPayload('warn', message, undefined, metadata);
-    console.warn(message);
+    if (typeof process === 'undefined' || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production')) {
+      // eslint-disable-next-line no-console
+      console.warn(`[WARN] ${message}`, metadata ?? '');
+    }
     this.sendToBackend(payload);
   }
 
   info(message: string, metadata?: any) {
     const payload = this.buildPayload('info', message, undefined, metadata);
-    console.info(message);
+    if (typeof process === 'undefined' || (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production')) {
+      // eslint-disable-next-line no-console
+      console.info(`[INFO] ${message}`, metadata ?? '');
+    }
     this.sendToBackend(payload);
   }
 }

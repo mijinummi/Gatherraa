@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v2 as cloudinary } from 'cloudinary';
 import { UploadApiResponse, UploadApiErrorResponse } from 'cloudinary';
@@ -23,6 +23,7 @@ export class FileUploadService {
   private readonly cdnProvider: string;
   private readonly cdnBaseUrl: string;
   private readonly useCloudinary: boolean;
+  private readonly logger = new Logger(FileUploadService.name);
 
   constructor(private readonly configService: ConfigService) {
     this.maxFileSize = parseInt(configService.get<string>('MAX_FILE_SIZE', '10485760')); // 10MB default
@@ -253,7 +254,7 @@ export class FileUploadService {
           resource_type: resourceType,
         });
       } catch (error) {
-        console.error('Failed to delete file from Cloudinary:', error);
+        this.logger.error('Failed to delete file from Cloudinary', error instanceof Error ? error.stack : undefined);
         throw new BadRequestException(`Failed to delete file: ${error.message}`);
       }
     } else {
@@ -293,7 +294,7 @@ export class FileUploadService {
           transformation: [{ format: 'jpg', width: 640, height: 360, crop: 'limit' }],
         });
       } catch (error) {
-        console.error('Failed to generate thumbnail:', error);
+        this.logger.error('Failed to generate thumbnail', error instanceof Error ? error.stack : undefined);
         return null;
       }
     }

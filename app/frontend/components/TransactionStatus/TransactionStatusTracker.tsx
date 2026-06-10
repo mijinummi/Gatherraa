@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { Badge } from "@/components/ui";
 import { Spinner } from "@/components/ui";
+import { logger } from "@/lib/logger";
 
 export type TransactionStatus = "pending" | "confirmed" | "failed";
 
@@ -131,7 +132,7 @@ export function TransactionStatusTracker({
         }
       }
     } catch (error) {
-      console.error("WebSocket message parsing error:", error);
+      logger.error("WebSocket message parsing error:", error);
     }
   }, [txHash, onSuccess, onError]);
 
@@ -153,7 +154,7 @@ export function TransactionStatusTracker({
       ws.onmessage = handleWebSocketMessage;
 
       ws.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        logger.error("WebSocket error:", error);
         // Fallback to polling
         startPolling();
       };
@@ -165,7 +166,7 @@ export function TransactionStatusTracker({
         }
       };
     } catch (error) {
-      console.error("WebSocket connection failed:", error);
+      logger.error("WebSocket connection failed:", error);
       // Fallback to polling
       startPolling();
     }

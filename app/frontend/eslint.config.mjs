@@ -17,6 +17,26 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // No console.* in production code — use the structured logger instead.
+      // Exceptions are handled via eslint-disable-next-line in logger.ts and story files.
+      "no-console": "error",
+    },
+  },
+  // Allow console.* in Storybook stories, test files, and scripts
+  {
+    files: [
+      "**/*.stories.{ts,tsx,js,jsx}",
+      "**/*.test.{ts,tsx,js,jsx}",
+      "**/*.spec.{ts,tsx,js,jsx}",
+      "**/scripts/**",
+      "**/seed*.{ts,js}",
+    ],
+    rules: {
+      "no-console": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

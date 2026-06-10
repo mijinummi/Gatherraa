@@ -1,4 +1,5 @@
 import { RealtimeEvent, RealtimeListener } from './events';
+import { logger } from '../monitoring/logger';
 
 class RealtimeService {
   private socket: WebSocket | null = null;
@@ -13,7 +14,7 @@ class RealtimeService {
     this.socket = new WebSocket(this.WS_URL);
 
     this.socket.onopen = () => {
-      console.log('WebSocket connected');
+      logger.info('WebSocket connected');
       this.reconnectAttempts = 0;
       this.startHeartbeat();
       this.stopPolling();
@@ -25,11 +26,11 @@ class RealtimeService {
     };
 
     this.socket.onerror = () => {
-      console.error('WebSocket error');
+      logger.error('WebSocket error');
     };
 
     this.socket.onclose = () => {
-      console.warn('WebSocket disconnected');
+      logger.warn('WebSocket disconnected');
       this.stopHeartbeat();
       this.tryReconnect();
       this.startPollingFallback();
@@ -63,7 +64,7 @@ class RealtimeService {
     this.reconnectAttempts++;
 
     setTimeout(() => {
-      console.log(`Reconnecting attempt ${this.reconnectAttempts}`);
+      logger.info(`Reconnecting attempt ${this.reconnectAttempts}`);
       this.connect();
     }, delay);
   }
@@ -89,7 +90,7 @@ class RealtimeService {
   private startPollingFallback() {
     if (this.pollingInterval) return;
 
-    console.warn('Starting polling fallback');
+    logger.warn('Starting polling fallback');
 
     this.pollingInterval = setInterval(async () => {
       const res = await fetch('/api/dashboard/updates');

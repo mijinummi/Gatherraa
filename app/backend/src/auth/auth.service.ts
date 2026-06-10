@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
@@ -20,6 +20,8 @@ export interface AuthTokens {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private usersService: UsersService,
     private sessionsService: SessionsService,
@@ -157,7 +159,7 @@ export class AuthService {
         return await this.sessionsService.invalidateUserSessions(userId);
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      this.logger.error('Logout error', error instanceof Error ? error.stack : undefined);
       return false;
     }
   }

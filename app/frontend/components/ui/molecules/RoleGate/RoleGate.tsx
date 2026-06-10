@@ -1,7 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Shield, ShieldCheck, AlertTriangle, Lock } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export interface Role {
   id: string;
@@ -151,7 +152,7 @@ const RoleGate = React.forwardRef<HTMLDivElement, RoleGateProps>(
       }
 
       if (logAccess) {
-        console.log('RoleGate Access Check:', {
+        logger.info('RoleGate Access Check:', {
           userRoles: roles,
           userPermissions,
           allowedRoles,

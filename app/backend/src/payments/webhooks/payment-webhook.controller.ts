@@ -7,6 +7,7 @@ import {
   BadRequestException,
   RawBodyRequest,
   Req,
+  Logger,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Repository } from 'typeorm';
@@ -20,6 +21,8 @@ import { StripeService } from '../services/stripe.service';
 
 @Controller('webhooks/payments')
 export class PaymentWebhookController {
+  private readonly logger = new Logger(PaymentWebhookController.name);
+
   constructor(
     private configService: ConfigService,
     private stripeService: StripeService,
@@ -68,7 +71,7 @@ export class PaymentWebhookController {
 
     // Process webhook asynchronously
     this.processStripeWebhook(event).catch((error) => {
-      console.error('Failed to process Stripe webhook:', error);
+      this.logger.error('Failed to process Stripe webhook', error instanceof Error ? error.stack : undefined);
     });
 
     return { received: true };
@@ -122,7 +125,7 @@ export class PaymentWebhookController {
 
       await this.webhookRepository.save(webhook);
     } catch (error) {
-      console.error('Error processing Stripe webhook:', error);
+      this.logger.error('Error processing Stripe webhook', error instanceof Error ? error.stack : undefined);
       throw error;
     }
   }
@@ -255,7 +258,7 @@ export class PaymentWebhookController {
 
     // Process asynchronously
     this.processBlockchainWebhook(body, webhook).catch((error) => {
-      console.error('Failed to process blockchain webhook:', error);
+      this.logger.error('Failed to process blockchain webhook', error instanceof Error ? error.stack : undefined);
     });
 
     return { received: true };
