@@ -107,7 +107,7 @@ cd ../frontend && npm install
 - `npm run test` - run tests across all workspace packages
 - `npm run workspace:status` - list workspace packages
 
-> If you see `ENOTFOUND` or module resolution issues, run `npm install` from the repository root and avoid invoking `npm install` inside subfolders unless you need a package-specific install.
+> A root `.npmrc` is included to keep installs predictable. Run `npm install` from the repository root and avoid running package installs from individual subfolders unless you need package-specific dependency changes.
 
 ### Running the Development Environment
 
