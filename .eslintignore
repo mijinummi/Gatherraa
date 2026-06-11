@@ -1,0 +1,13 @@
+node_modules/
+**/node_modules/
+.next/
+dist/
+build/
+out/
+coverage/
+coverage/**
+*.log
+*.cache
+.vscode/
+contract/target/
+tests/integration/test-results/

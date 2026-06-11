@@ -104,11 +104,13 @@ cd ../frontend && npm install
 - `npm run install` - install all workspace dependencies
 - `npm run build` - build all workspace packages
 - `npm run lint` - lint all workspace packages
+- `npm run format` - format all workspace packages
 - `npm run test` - run tests across all workspace packages
 - `npm run clean` - remove workspace install artifacts
 - `npm run workspace:status` - list workspace packages
 
-> A root `.npmrc` and `.nvmrc` are included to keep installs predictable. Run `npm install` from the repository root and avoid running package installs from individual subfolders unless you need package-specific dependency changes.
+> This repository includes root-level formatting and linting configuration: `.editorconfig`, `.prettierrc`, `.eslintrc.json`, `.eslintignore`, and `.prettierignore`.
+> Run `npm install` from the repository root and avoid running package installs from individual subfolders unless you need package-specific dependency changes.
 
 ### Running the Development Environment
 
