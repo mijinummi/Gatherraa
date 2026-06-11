@@ -3,7 +3,7 @@
     "ethereum": {
       "chainId": 1,
       "name": "Ethereum Mainnet",
-      "rpcUrl": "https://mainnet.infura.io/v3/YOUR_PROJECT_ID",
+      "rpcUrl": "https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}",
       "blockTime": 12,
       "gasLimit": 300000,
       "confirmations": 12,
@@ -119,7 +119,7 @@
     "sepolia": {
       "chainId": 11155111,
       "name": "Sepolia Testnet",
-      "rpcUrl": "https://sepolia.infura.io/v3/YOUR_PROJECT_ID",
+      "rpcUrl": "https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}",
       "blockTime": 12,
       "gasLimit": 300000,
       "confirmations": 12,
