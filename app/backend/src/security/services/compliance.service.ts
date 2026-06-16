@@ -1,15 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository } from 'typeorm';
 import { 
   Entity, 
   PrimaryGeneratedColumn, 
   Column, 
   CreateDateColumn, 
+  UpdateDateColumn,  
   Index,
-  ManyToOne,
-  JoinColumn 
+
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { SecurityAuditService } from './security-audit.service';
@@ -345,10 +345,16 @@ export class ComplianceService {
   }
 
   async getComplianceReportById(id: string): Promise<ComplianceReport> {
-    return this.reportRepository.findOne({
-      where: { id },
-    });
+  const report = await this.reportRepository.findOne({
+    where: { id },
+  });
+
+  if (!report) {
+    throw new Error('Report not found');
   }
+
+  return report;
+}
 
   async performComplianceCheck(
     framework: ComplianceFramework,
