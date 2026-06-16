@@ -536,12 +536,13 @@ export class ContentExtractionService {
     return entities;
   }
 
-  const entities: ExtractedContent['entities'] = [];
+ private extractOrganizations(text: string): ExtractedContent['entities'] {
+    const entities: ExtractedContent['entities'] = [];
 
-  // Common organization indicators
-  const orgIndicators = ['Inc', 'Corp', 'LLC', 'Ltd', 'Company', 'Corporation', 'University', 'Institute'];
+    // Common organization indicators
+    const orgIndicators = ['Inc', 'Corp', 'LLC', 'Ltd', 'Company', 'Corporation', 'University', 'Institute'];
 
-  for(const indicator of orgIndicators) {
+    for (const indicator of orgIndicators) {
     const pattern = new RegExp(`\\b([A-Z][a-zA-Z\\s&]+${indicator})\\b`, 'g');
     let match;
     while ((match = pattern.exec(text)) !== null) {
